@@ -6,7 +6,7 @@ BASE=${BASE:-"/root/backup-script"}
 
 source "${BASE}/.env"
 
-CIFS_SERVER=${CIFS_SERVER:-"192.168.1.200"}
+CIFS_SERVER=${CIFS_SERVER:-"192.168.0.10"}
 CIFS_SHARES=${CIFS_SHARES:-"${CIFS_SERVER}/D ${CIFS_SERVER}/E"}
 MAILJET_URL="https://api.mailjet.com/v3.1/send"
 EMAIL_NAME=${EMAIL_NAME:-"$(hostname -f)"}
