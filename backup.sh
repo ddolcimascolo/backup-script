@@ -40,7 +40,7 @@ function mailContentForShare() {
         }
       ],
       "Subject": "Backup complete for ${share}",
-      "TextPart": "$(sed -z 's/\n/\\n/g' "$(localPath "${share}")/.rsync.output")"
+      "TextPart": "$(sed -z -e 's/\n/\\n/g' -e 's/\r//g' "$(localPath "${share}")/.rsync.output")"
     }
   ]
 }
