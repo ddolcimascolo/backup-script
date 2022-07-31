@@ -6,8 +6,9 @@ BASE=${BASE:-"/root/backup-script"}
 
 source "${BASE}/.env"
 
-CIFS_SERVER=${CIFS_SERVER:-"192.168.0.10"}
-CIFS_SHARES=${CIFS_SHARES:-"${CIFS_SERVER}/D ${CIFS_SERVER}/E"}
+SERVER=${SERVER:-"192.168.0.10"}
+REMOTE_USER=${REMOTE_USER:-"david"}
+SHARES=${SHARES:-"Data Data_2"}
 MAILJET_URL="https://api.mailjet.com/v3.1/send"
 EMAIL_NAME=${EMAIL_NAME:-"$(hostname -f)"}
 
@@ -50,14 +51,10 @@ EOF
 function mountShare() {
   local share="${1}"
 
-  mount -t cifs \
-        //${share} \
-        -o username=${CIFS_USERNAME} \
-        -o password=${CIFS_PASSWORD} \
+  mount -t fuse.sshfs \
+        "${REMOTE_USER}@${SERVER}:/media/${REMOTE_USER}/${share}" \
         -o ro \
         -o uid=david \
-        -o file_mode=0644 \
-        -o dir_mode=0755 \
         "$(mountPath "${share}")"
 }
 
@@ -73,11 +70,11 @@ function backupShare() {
   rsync -avHP --delete --exclude-from "$(mountPath "${share}")/.rsyncignore" "$(mountPath "${share}")/" "$(localPath "${share}")" | tee "$(localPath "${share}")/.rsync.output"
 }
 
-function mountPath() { echo "/mnt/${1}"; }
-function localPath() { echo "/srv/${1}"; }
+function mountPath() { echo "/mnt/${SERVER}/${1}"; }
+function localPath() { echo "/srv/${SERVER}/${1}"; }
 
 function run() {
-  for share in ${CIFS_SHARES}; do
+  for share in ${SHARES}; do
     mkdir -p "$(localPath "${share}")" "$(mountPath "${share}")"
 
     mountShare "${share}"
